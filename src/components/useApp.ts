@@ -3,10 +3,11 @@ import { getSnapshot, subscribe } from "../core/store";
 import type { AppSnapshot } from "../core/types";
 
 export function useApp(): AppSnapshot {
-  const [snap, setSnap] = useState(getSnapshot);
+  const [snap, setSnap] = useState(() => structuredClone(getSnapshot()));
   useEffect(() => {
-    setSnap(getSnapshot());
-    return subscribe(() => setSnap(getSnapshot()));
+    const sync = () => setSnap(structuredClone(getSnapshot()));
+    sync();
+    return subscribe(sync);
   }, []);
   return snap;
 }
