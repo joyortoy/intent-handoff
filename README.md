@@ -4,6 +4,10 @@
 
 Websites already know what a person wants — origin, destination, budget, transit, flight window — because the person just clicked those things. Today an agent still has to reconstruct that context from a giant prompt. Intent Handoff accumulates ordinary UI interaction as structured state, exposes it through WebMCP tools, and lets an agent continue the task without asking “where are you going?”
 
+**Live demo:** https://intent-handoff.joyhuiqi.workers.dev
+
+**Repository:** https://github.com/joyortoy/intent-handoff
+
 ## Why WebMCP?
 
 Websites speak visually to humans. Agents usually scrape the DOM or ask the human to restate everything. This project makes the same live page state available as typed tools: `get_current_intent`, `get_selected_constraints`, `get_task_context`, `start_task`, `report_progress`, `search_trip_options`, `submit_result`, `apply_constraint_delta`, and `get_task_status`.
