@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { registerWebMcpTools } from "./webmcp/register";
 import { DebugPanel } from "./components/DebugPanel";
 import { Header } from "./components/Header";
 import { Hero } from "./components/Hero";
@@ -9,10 +7,6 @@ import { TripPanel } from "./components/TripPanel";
 import { isDebug, isDemo } from "./flags";
 
 export default function App() {
-  useEffect(() => {
-    void registerWebMcpTools();
-  }, []);
-
   return (
     <div className={`page ${isDemo() ? "is-demo" : ""}`}>
       <Header />

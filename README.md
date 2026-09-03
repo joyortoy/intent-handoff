@@ -18,7 +18,7 @@ Human interaction → structured intent → WebMCP → agent → execution → r
 
 ## Demo path (under 3 minutes)
 
-1. Open the public URL in Chrome with WebMCP enabled, or ChatGPT’s in-app browser.
+1. Open the public URL in ChatGPT’s desktop browser (GPT-5.6 Sol or Terra, site tools on), or Chrome with WebMCP enabled.
 2. From **Singapore** → **Tokyo**.
 3. Dates: **Next week**.
 4. Hotel budget **≤ $200**. Toggle **Near train station**. Flight **Late**. Priority **Balance**.

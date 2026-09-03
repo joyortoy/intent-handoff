@@ -1,5 +1,6 @@
+import { isDemo } from "../flags";
 import { getSnapshot, markHumanApproved } from "../core/store";
-import { invokeTool } from "../webmcp/register";
+import { getModelContext, invokeTool } from "../webmcp/register";
 
 function sleep(ms: number) {
   const demo =
@@ -7,14 +8,20 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, demo ? Math.min(ms, 280) : ms));
 }
 
+function agentWillContinue(): boolean {
+  return Boolean(getModelContext()) && !isDemo();
+}
+
 export async function delegateToAgent(): Promise<void> {
   const { token } = markHumanApproved();
   await invokeTool("start_task", { confirmation: token });
+  if (agentWillContinue()) return;
   await runPlanner();
 }
 
 export async function refineWithBudget(to: number): Promise<void> {
   await invokeTool("apply_constraint_delta", { field: "hotelMaxNightly", to });
+  if (agentWillContinue()) return;
   await runPlanner();
 }
 

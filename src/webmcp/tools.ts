@@ -212,7 +212,7 @@ export const TOOLS: ToolDefinition[] = [
     inputSchema: {
       type: "object",
       properties: {
-        field: { type: "string", const: "hotelMaxNightly" },
+        field: { type: "string", enum: ["hotelMaxNightly"] },
         to: { type: "number" },
       },
       required: ["field", "to"],
