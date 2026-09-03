@@ -8,21 +8,26 @@ export function DebugPanel() {
     <section className="debug" aria-label="Debug">
       <div className="debug-head">
         <h2>Debug</h2>
-        <p>Hidden from the demo unless ?debug=true</p>
+        <p>Visible only with ?debug=true</p>
         <button type="button" onClick={() => resetDemo()}>
           Reset
         </button>
       </div>
       <div className="debug-grid">
-        <pre>{JSON.stringify(getSnapshot().intent, null, 2)}</pre>
         <div>
-          <h3>WebMCP</h3>
-          <p>API: {snap.webmcp.api}</p>
+          <h3>Structured intent</h3>
+          <pre>{JSON.stringify(getSnapshot().intent, null, 2)}</pre>
+        </div>
+        <div>
+          <h3>Task</h3>
+          <p>ID: {snap.taskId ?? "—"}</p>
+          <p>Status: {snap.intent.status}</p>
+          <p>Version: {snap.intent.version}</p>
+          <p>WebMCP API: {snap.webmcp.api}</p>
           <p>Available: {String(snap.webmcp.available)}</p>
-          <p>Task: {snap.taskId ?? "—"}</p>
-          <p>State: {snap.intent.status}</p>
-          <p>Updated: {snap.timestamps.updatedAt}</p>
-          <h3>Registered tools</h3>
+          <h3>Constraint delta</h3>
+          <pre>{JSON.stringify(snap.delta, null, 2)}</pre>
+          <h3>WebMCP tools</h3>
           <ul>
             {TOOLS.map((tool) => (
               <li key={tool.name}>{tool.name}</li>
@@ -40,7 +45,7 @@ export function DebugPanel() {
           </li>
         ))}
       </ol>
-      <h3>Agent result</h3>
+      <h3>Result payload</h3>
       <pre>{JSON.stringify(snap.result, null, 2)}</pre>
     </section>
   );

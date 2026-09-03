@@ -2,7 +2,9 @@ import { getSnapshot, markHumanApproved } from "../core/store";
 import { invokeTool } from "../webmcp/register";
 
 function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  const demo =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("demo") === "true";
+  return new Promise((resolve) => setTimeout(resolve, demo ? Math.min(ms, 280) : ms));
 }
 
 export async function delegateToAgent(): Promise<void> {
@@ -47,7 +49,7 @@ async function runPlanner(): Promise<void> {
 
 export function canStart(): { ok: boolean; reason?: string } {
   const snap = getSnapshot();
-  if (!snap.intent.origin) return { ok: false, reason: "Choose an origin." };
+  if (!snap.intent.origin) return { ok: false, reason: "Choose where you’re leaving from." };
   if (!snap.intent.destination) return { ok: false, reason: "Choose a destination." };
   if (!snap.intent.dates) return { ok: false, reason: "Choose dates." };
   if (snap.intent.origin === snap.intent.destination) {

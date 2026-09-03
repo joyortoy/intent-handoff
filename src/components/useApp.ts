@@ -12,7 +12,4 @@ export function useApp(): AppSnapshot {
   return snap;
 }
 
-export function isDebug(): boolean {
-  if (typeof window === "undefined") return false;
-  return new URLSearchParams(window.location.search).get("debug") === "true";
-}
+export { isDebug, isDemo } from "../flags";

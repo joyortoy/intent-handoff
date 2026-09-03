@@ -1,49 +1,48 @@
 import { useEffect } from "react";
 import { registerWebMcpTools } from "./webmcp/register";
 import { DebugPanel } from "./components/DebugPanel";
-import { IntentTray } from "./components/IntentTray";
-import { Planner } from "./components/Planner";
-import { isDebug, useApp } from "./components/useApp";
+import { Header } from "./components/Header";
+import { Hero } from "./components/Hero";
+import { Preferences } from "./components/Preferences";
+import { SearchBar } from "./components/SearchBar";
+import { TripPanel } from "./components/TripPanel";
+import { isDebug, isDemo } from "./flags";
 
 export default function App() {
-  const snap = useApp();
-
   useEffect(() => {
     void registerWebMcpTools();
   }, []);
 
   return (
-    <div className="shell" data-phase={snap.intent.status}>
-      <div className="grain" aria-hidden="true" />
-      <header className="mast">
-        <div>
-          <p className="eyebrow">WebMCP · Human → Agent</p>
-          <h1>Intent Handoff</h1>
-          <p className="tagline">Click what you want. Let the agent take it from there.</p>
+    <div className={`page ${isDemo() ? "is-demo" : ""}`}>
+      <Header />
+      <Hero />
+      <SearchBar />
+      <div className="stage">
+        <div className="stage-main">
+          <Preferences />
+          <section className="how" id="how">
+            <h2>How it works</h2>
+            <p className="how-sub">Choose what matters. JoyRelay handles the rest.</p>
+            <ol>
+              <li>
+                <strong>Choose what matters</strong>
+                <span>Budget, transit, arrival, and style become your trip.</span>
+              </li>
+              <li>
+                <strong>Hand it to JoyRelay</strong>
+                <span>We compare stays against exactly what you selected.</span>
+              </li>
+              <li>
+                <strong>Change one thing</strong>
+                <span>Update a budget. Everything else stays with you.</span>
+              </li>
+            </ol>
+          </section>
         </div>
-        <div className="mast-meta">
-          <WebMcpPill />
-          <p className="mast-note">No prompt required. Structured intent is the source of truth.</p>
-        </div>
-      </header>
-
-      <main className="layout">
-        <Planner />
-        <IntentTray />
-      </main>
-
+        <TripPanel />
+      </div>
       {isDebug() ? <DebugPanel /> : null}
     </div>
-  );
-}
-
-function WebMcpPill() {
-  const snap = useApp();
-  const live = snap.webmcp.available;
-  return (
-    <span className={`pill ${live ? "pill-live" : "pill-fallback"}`}>
-      <span className="dot" />
-      {live ? `WebMCP live · ${snap.webmcp.api}` : "WebMCP tools registered · waiting for browser API"}
-    </span>
   );
 }

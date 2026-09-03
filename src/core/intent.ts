@@ -63,16 +63,37 @@ export function constraintLines(intent: Intent): string[] {
   const lines = [`Hotel ≤ $${intent.constraints.hotelMaxNightly}/night`];
   if (intent.constraints.nearTransit) lines.push("Near train station");
   if (intent.constraints.preferredDeparture !== "any") {
-    lines.push(
-      `${intent.constraints.preferredDeparture.charAt(0).toUpperCase()}${intent.constraints.preferredDeparture.slice(1)} departure preferred`,
-    );
+    const window =
+      intent.constraints.preferredDeparture.charAt(0).toUpperCase() +
+      intent.constraints.preferredDeparture.slice(1);
+    lines.push(intent.constraints.preferredDeparture === "late" ? "Late arrival" : `${window} arrival`);
   }
   if (intent.constraints.quietHotel) lines.push("Quiet hotel");
-  if (intent.priority === "balanced") lines.push("Balance convenience and price");
+  if (intent.priority === "balanced") lines.push("Balanced");
   if (intent.priority === "price") lines.push("Prioritize price");
   if (intent.priority === "convenience") lines.push("Prioritize convenience");
   if (intent.notes.trim()) lines.push(intent.notes.trim());
   return lines;
+}
+
+export function consumerSummary(intent: Intent): string {
+  if (!intent.origin || !intent.destination || !intent.dates) {
+    return "Tell us what matters to you. We’ll handle the rest.";
+  }
+  const transit = intent.constraints.nearTransit ? " near transit" : "";
+  const arrival =
+    intent.constraints.preferredDeparture === "late"
+      ? ", with a late arrival option"
+      : intent.constraints.preferredDeparture === "any"
+        ? ""
+        : `, with a ${intent.constraints.preferredDeparture} arrival`;
+  const style =
+    intent.priority === "price"
+      ? " and a focus on price"
+      : intent.priority === "convenience"
+        ? " and a focus on convenience"
+        : " and a good balance of price and convenience";
+  return `Find a ${intent.destination} stay under $${intent.constraints.hotelMaxNightly}/night${transit}${arrival}${style}.`;
 }
 
 export function getTaskContext(intent: Intent, extras: Record<string, unknown> = {}) {

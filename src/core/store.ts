@@ -12,7 +12,7 @@ import {
   type ToolCallLog,
 } from "./types";
 
-const STORAGE_KEY = "intent-handoff.v1";
+const STORAGE_KEY = "joyrelay.v1";
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -57,6 +57,10 @@ function initialSnapshot(): AppSnapshot {
 }
 
 function load(): AppSnapshot {
+  if (typeof window !== "undefined") {
+    const demo = new URLSearchParams(window.location.search).get("demo") === "true";
+    if (demo) return initialSnapshot();
+  }
   if (typeof localStorage === "undefined") return initialSnapshot();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
