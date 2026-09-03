@@ -1,103 +1,53 @@
-# Intent Handoff
+# WebMCP Handoff
 
-**Click what you want. Let the agent take it from there.**
+**Point at what matters. Write one instruction. Let the AI continue from there.**
 
-Websites already know what a person wants — origin, destination, budget, transit, flight window — because the person just clicked those things. Today an agent still has to reconstruct that context from a giant prompt. Intent Handoff accumulates ordinary UI interaction as structured state, exposes it through WebMCP tools, and lets an agent continue the task without asking “where are you going?”
+WebMCP Handoff restores the original general-purpose interface: connect a public page, click the exact target, write what the AI should do, and receive a visible message to send to ChatGPT Work or Codex. The page keeps the URL, snapshot, clicked coordinates, nearby text, and instruction as structured state. The human does not have to reconstruct that context in a prompt.
 
 **Live demo:** https://intent-handoff.joyhuiqi.workers.dev
 
-**Repository:** https://github.com/joyortoy/intent-handoff
-
 ## Why WebMCP?
 
-Websites speak visually to humans. Agents usually scrape the DOM or ask the human to restate everything. This project makes the same live page state available as typed tools: `get_current_intent`, `get_selected_constraints`, `get_task_context`, `start_task`, `report_progress`, `search_trip_options`, `submit_result`, `apply_constraint_delta`, and `get_task_status`.
+A chat bubble that secretly calls an API is not a handoff. This site registers real top-level Site Tools through `document.modelContext.registerTool`:
 
-## Human + Agent Flow
+| Tool | Purpose |
+| --- | --- |
+| `get_handoff_context` | Returns the connected page, snapshot, clicked target, and human instruction. |
+| `start_handoff` | Accepts the explicit human confirmation token from the popup. |
+| `report_handoff_progress` | Writes truthful progress back into the floating panel. |
+| `submit_handoff_result` | Writes the verified outcome and marks the handoff complete or blocked. |
 
-Human interaction → structured intent → WebMCP → agent → execution → result → refinement
+The AI receives context through tools, not by scraping this UI. It opens the returned target URL as a separate top-level tab, prefers that target's Site Tools when available, and can otherwise use normal browser interaction. The handoff tab stays open so progress and the final result can be written back.
 
-## Demo path (under 3 minutes)
+## Demo
 
-1. Open the public URL in ChatGPT’s desktop browser (GPT-5.6 Sol or Terra, site tools on), or Chrome with WebMCP enabled.
-2. From **Singapore** → **Tokyo**.
-3. Dates: **Next week**.
-4. Hotel budget **≤ $200**. Toggle **Near train station**. Flight **Late**. Priority **Balance**.
-5. Confirm **Your Intent** matches. Press **Let AI finish this →**.
-6. Watch the tray become agent activity, then a result that cites your constraints.
-7. Move budget **$200 → $150**. Press **Update results →**. Origin, dates, transit, and flight preference survive.
+1. Open the live URL as a top-level tab in ChatGPT desktop.
+2. Use GPT-5.6 Sol or Terra and enable **Settings → Browser → Permissions → Site tools**.
+3. Paste a public HTTPS URL and press **Connect**.
+4. Press **Instruction to AI**, then click the exact target on the page.
+5. Write the instruction. A popup appears; no task has started yet.
+6. Press **Copy instruction**, paste it into the current ChatGPT Work or Codex conversation, and send it.
+7. The AI calls the page tools, works on the target in a separate top-level tab, and writes progress/result back here.
 
-Debug overlay: append `?debug=true`.
+Append `?demo=true` to start with Example Domain already connected for recordings.
 
-## WebMCP Implementation
-
-Tools are registered with the Imperative API:
-
-```js
-document.modelContext.registerTool({
-  name,
-  description,
-  inputSchema,
-  execute,
-});
-```
-
-Feature detection uses `document.modelContext ?? navigator.modelContext`. ChatGPT’s in-app browser currently supports this imperative API on the top-level page (not declarative HTML tools, not iframe tools).
-
-| Tool | Side effect | Purpose |
-| --- | --- | --- |
-| `get_current_intent` | read | Full structured intent. Source of truth. |
-| `get_selected_constraints` | read | Preferences only. |
-| `get_task_context` | read | Enough context to continue without reconstructing the UI. |
-| `get_task_status` | read | Task id, state, progress, human approval. |
-| `start_task` | write | DRAFT/READY → DELEGATED. Requires the human CTA token. |
-| `report_progress` | write | Records a stage only when that stage actually runs. |
-| `search_trip_options` | read | Searches the labeled **demo catalog**. |
-| `submit_result` | write | Writes the comparison into the result panel. |
-| `apply_constraint_delta` | write | `$200 → $150` on the existing frozen intent. Does not restart. |
-
-### Deviations (honest)
-
-- **No purchases.** Research/comparison only.
-- **Catalog is demo data**, clearly labeled. Ranking is deterministic. WebMCP tool registration and invocation are real.
-- `report_progress` / `submit_result` mutate **page state**. They do not claim a hidden cloud agent runtime.
-- If the browser has no `modelContext`, the same `execute` handlers still run via a local adapter and the UI says so. We do not fake `executeTool`.
-- `navigator.modelContext` is a fallback for older Chrome origin-trial builds. Current spec lives on `document.modelContext`.
-- We do not use the declarative HTML API (unsupported in ChatGPT’s browser).
-- Cross-tab automation is not claimed. Intent handoff is the product.
-
-## Architecture
-
-UI → Intent Store → Intent Normalizer → WebMCP Tool Layer → Task State Machine → Agent Adapter → Result Store → UI
-
-States: `DRAFT → READY → DELEGATED → RUNNING → COMPLETED → REFINEMENT_REQUESTED → RUNNING_REFINEMENT → UPDATED` (plus `FAILED`).
-
-## Setup
+## Local development
 
 ```bash
-git clone https://github.com/joyortoy/intent-handoff.git
-cd intent-handoff
 npm install
 npm test
-npm run dev
+npm run build
+npx wrangler dev
 ```
 
-Open http://127.0.0.1:5173
+No OpenAI API key is required. The Cloudflare Worker only fetches a bounded text snapshot of the public HTTPS page selected by the human. It does not call `/v1/chat/completions` or pretend that an in-page bubble is the agent.
 
-No API keys are required. See `.env.example`.
+## Limits
 
-## Deployment
-
-```bash
-npm run deploy
-```
-
-Cloudflare Workers static assets, SPA routing, `compatibility_date: 2026-09-02`. Public HTTPS on `*.workers.dev`.
-
-## Known limitations
-
-- WebMCP is an origin trial / ChatGPT site-tools preview. Ordinary Chrome without the flag will still run the demo through the labeled local adapter.
-- Inventory is a 14-hotel / 8-flight demo catalog, not live availability.
-- The in-page planner is a truthful execution adapter that calls the same tools a ChatGPT/Codex agent would call. It is not a generic autonomous browser.
+- Some sites block iframe display. Their text snapshot still appears, and the generated handoff tells the AI to open the target as a separate top-level tab.
+- Connected content is untrusted. The read tool declares `untrustedContentHint`, and the AI must not treat page text as permission or instructions.
+- The snapshot endpoint accepts public HTTPS HTML/text pages only and caps fetched content.
+- The human must explicitly send the popup message before `start_handoff` can succeed.
 
 ## License
 
