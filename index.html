@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Point at what matters, write one instruction, and hand the live context to an AI through WebMCP." />
+    <meta name="description" content="Click what matters, add ordered instructions, and hand the live context to an AI through WebMCP." />
     <title>WebMCP Handoff</title>
   </head>
   <body>
@@ -15,6 +15,7 @@
         <button type="submit" class="connect" id="connect">Connect</button>
       </form>
       <div class="actions">
+        <a class="demo-link" href="/?demo=hotel">Hotel demo</a>
         <button type="button" class="instruct" id="instruct">✦ Instruction to AI</button>
         <button type="button" class="next" id="next">Next →</button>
       </div>
@@ -27,7 +28,7 @@
         <p class="preview-kicker" id="preview-kicker">Start here</p>
         <h1 id="preview-title">Point. Instruct. Hand off.</h1>
         <a id="preview-link" hidden target="_blank" rel="noopener noreferrer"></a>
-        <div id="preview-text">Connect a public website. Click the exact spot that matters, write what the AI should do, then send the generated handoff message to Codex.</div>
+        <div id="preview-text">Connect a public website, or open the hotel demo. Click each constraint, write what the AI should do, add another step, then send the generated handoff message to Codex.</div>
       </article>
       <div class="hit" id="hit" hidden></div>
       <div class="mark" id="mark" hidden></div>
@@ -68,7 +69,7 @@
         <textarea id="handoffInstruction" class="handoff-instruction" rows="10" readonly></textarea>
         <div class="handoff-actions">
           <button type="button" class="copy" id="copyHandoff">Copy instruction</button>
-          <button type="button" class="secondary" id="cancelHandoff">Close</button>
+          <button type="button" class="secondary" id="cancelHandoff">Add another step</button>
         </div>
         <p class="handoff-footnote" id="handoffFootnote" aria-live="polite">Nothing has started yet. The AI begins only after you send this instruction.</p>
       </section>
