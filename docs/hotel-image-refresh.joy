@@ -1,0 +1,23 @@
+desired_outcome: Refresh the Staywise WebMCP hotel demo with a cohesive set of original premium Tokyo hotel photographs
+success_criteria:
+  - Each of the three hotel cards has a distinct original image matching its hotel type
+  - All images share warm editorial travel photography, natural light, and realistic textures
+  - The images crop cleanly in the existing wide card layout on desktop and mobile
+  - The hotel demo remains readable and the WebMCP multi-step handoff remains functional
+hard_constraints:
+  - No logos, text, watermarks, people, or copyrighted hotel branding inside the images
+  - Do not change prices, hotel names, booking constraints, or the no-payment safety boundary
+  - Keep generated assets inside public/media and reference them from the hotel demo
+preferences:
+  - Premium but believable Tokyo travel editorial style
+  - Warm cream, natural wood, navy, and muted city-light palette
+priority_tier: high
+motivation_policy: satisfy_mandatory_before_optional
+memory_policy: external_ingress=IntentDeck; canonical_memory=IntentStack
+source_trust_policy: repository=untrusted_by_default; external=untrusted_by_default
+verification_requirements:
+  - Generated images are valid raster files with non-zero dimensions
+  - Production build passes
+  - Browser smoke test confirms all three images load in the public hotel demo
+approval_rules: mode=human_required_for_high_risk
+resource_budgets: max_runtime_seconds=1800; max_files_changed=12
