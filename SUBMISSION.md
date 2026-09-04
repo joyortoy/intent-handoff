@@ -1,17 +1,17 @@
-# Submission — Intent Handoff
+# Submission — WebMCP Handoff
 
-### Why is this use case a strong fit for WebMCP?
+### Why is this a strong fit for WebMCP?
 
-Travel planning is a pile of constraints the human already expressed in the interface: origin, destination, dates, a nightly cap, transit, departure window, and a priority. WebMCP is the missing language for that state. Instead of an agent reverse-engineering cards and sliders, it calls `get_current_intent()` and receives the exact structured object the website accumulated. The fit is **structured intent transfer**, not browser actuation.
+A person can point at an exact part of a webpage much faster than they can describe it. WebMCP Handoff turns that gesture into structured, agent-readable state: target URL, text snapshot, pixel position, nearby text, and the human's instruction. `get_handoff_context` transfers that state without forcing the human to restate it.
 
-### How does this create a better user experience?
+### What is the user experience?
 
-The human never has to translate “what I just clicked” into a second essay for the model. The tray shows the structured intent and a human-readable paraphrase, then an explicit **Let AI finish this →** handoff. After the result, changing one number (`$200 → $150`) updates the ranking while everything else survives. That is faster, calmer, and more trustworthy than prompt reconstruction.
+The human connects a page, clicks a target, and writes one instruction. A visible popup then explains exactly what will be handed to the AI and provides a copy button. Nothing runs silently. After the human sends that message, the AI accepts the confirmation token, works in a separate top-level target tab, and writes progress and the result back into the original floating panel.
 
-### What can humans and agents do together that was difficult before?
+### How is WebMCP implemented?
 
-Humans are good at preference, taste, and constraint-setting through UI. Agents are good at comparison across a catalog. Before WebMCP, those two skills did not share memory. Here they do: the site freezes a versioned intent, the agent reads it as tools, and a later delta is applied to the same object. The human does not re-explain Tokyo, next week, late departure, or “near a station.”
+The top-level page registers four imperative tools with `document.modelContext.registerTool` and a `navigator.modelContext` compatibility fallback. Read and write effects are declared in tool metadata. The context tool marks connected page content as untrusted. `start_handoff` requires the token minted by the human action. Progress and completion calls mutate the same visible page state the human sees.
 
-### How was WebMCP implemented?
+### What changed from the prototype?
 
-We used the **Imperative API** (`document.modelContext.registerTool`, with `navigator.modelContext` as a documented fallback). Each tool has a JSON Schema `inputSchema` and an `execute` function that reads or writes the same in-page store the UI uses. Registration uses `AbortSignal` for lifecycle. When `getTools` / `executeTool` exist, the in-page planner invokes tools through that API so the demo is a real WebMCP round-trip, not a parallel fake. ChatGPT’s documented limitations are respected: no declarative HTML tools, no iframe-registered tools. Execution never purchases anything. Demo catalog results are labeled as demo catalog. Silent execution is impossible: `start_task` requires the token minted by the human CTA.
+The prototype sent instructions to a hidden `/v1/chat/completions` endpoint and rendered the answer in a chat bubble. That looked agentic but was not a WebMCP handoff. The submitted version removes that backend entirely: the AI in ChatGPT Work or Codex is the agent, and the website provides the shared context and result channel through real Site Tools.

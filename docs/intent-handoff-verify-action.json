@@ -1,0 +1,15 @@
+{
+  "requested_paths": ["**"],
+  "requested_tools": ["sh"],
+  "network_policy": "deny",
+  "resource_limits": {
+    "max_runtime_seconds": 300,
+    "max_files_changed": 20
+  },
+  "risk_level": "low",
+  "command": [
+    "/bin/sh",
+    "-lc",
+    "npm test -- --reporter=dot && npm run typecheck && npm run build"
+  ]
+}

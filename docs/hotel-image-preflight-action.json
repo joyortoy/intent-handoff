@@ -1,0 +1,8 @@
+{
+  "requested_paths": ["public/hotel-demo.html", "public/media/**"],
+  "requested_tools": ["sh"],
+  "network_policy": "deny",
+  "resource_limits": {"max_runtime_seconds": 60, "max_files_changed": 12},
+  "risk_level": "low",
+  "command": ["/bin/sh", "-lc", "test -s public/hotel-demo.html && test -s public/media/hotel-kanda.jpg && test -s public/media/hotel-kyobashi.jpg && test -s public/media/hotel-capsule.jpg"]
+}

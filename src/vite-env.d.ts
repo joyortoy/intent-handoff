@@ -1,13 +1,5 @@
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {
-  readonly VITE_FORCE_DEMO_AGENT?: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
 type WebMcpInputSchema = {
   type: "object";
   properties: Record<string, unknown>;

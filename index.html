@@ -2,22 +2,79 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Click what you want. Let the agent take it from there. Intent Handoff turns ordinary website interactions into structured WebMCP tools for AI agents."
-    />
-    <title>Intent Handoff</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap"
-      rel="stylesheet"
-    />
+    <meta name="description" content="Click what matters, add ordered instructions, and hand the live context to an AI through WebMCP." />
+    <title>WebMCP Handoff</title>
   </head>
   <body>
-    <div id="root"></div>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="WebMCP Handoff home"><span class="spark" aria-hidden="true">✦</span><strong>WebMCP Handoff</strong></a>
+      <form class="open" id="open">
+        <label class="sr-only" for="url">Website URL</label>
+        <input id="url" type="url" inputmode="url" placeholder="Paste a website URL, then press Connect" spellcheck="false" required />
+        <button type="submit" class="connect" id="connect">Connect</button>
+      </form>
+      <div class="actions">
+        <a class="demo-link" href="/?demo=hotel">Hotel demo</a>
+        <button type="button" class="instruct" id="instruct">✦ Instruction to AI</button>
+        <button type="button" class="next" id="next">Next →</button>
+      </div>
+    </header>
+    <p class="conn" id="conn">Not connected. Paste a public URL and press Connect.</p>
+
+    <main id="stage">
+      <iframe id="frame" title="Connected website" sandbox="allow-scripts allow-forms allow-popups allow-same-origin" hidden></iframe>
+      <article class="preview" id="preview">
+        <p class="preview-kicker" id="preview-kicker">Start here</p>
+        <h1 id="preview-title">Point. Instruct. Hand off.</h1>
+        <a id="preview-link" hidden target="_blank" rel="noopener noreferrer"></a>
+        <div id="preview-text">Connect a public website, or open the hotel demo. Click each constraint, write what the AI should do, add another step, then send the generated handoff message to Codex.</div>
+      </article>
+      <div class="hit" id="hit" hidden></div>
+      <div class="mark" id="mark" hidden></div>
+      <form class="pixel-prompt" id="pixelPrompt" hidden>
+        <strong>What should the AI do here?</strong>
+        <p id="pixelMeta"></p>
+        <div class="row">
+          <label class="sr-only" for="pixelInstruction">Instruction for the AI</label>
+          <input id="pixelInstruction" name="instruction" type="text" placeholder="e.g. Summarize this, fill this, compare this…" autocomplete="off" required />
+          <button type="submit" class="send" aria-label="Prepare handoff">➤</button>
+        </div>
+      </form>
+    </main>
+
+    <section class="panel" id="panel" aria-label="Handoff activity">
+      <div class="panel-head">
+        <span class="spark-wrap" aria-hidden="true">✦</span>
+        <div><strong>AI Handoff</strong><p class="agent-state" id="agentState">Waiting for an instruction</p></div>
+        <button type="button" class="icon" id="min" aria-label="Minimize">▾</button>
+      </div>
+      <div class="log" id="log" aria-live="polite"></div>
+      <form class="reply" id="reply">
+        <label class="sr-only" for="message">Follow-up instruction</label>
+        <input id="message" type="text" placeholder="Add a follow-up…" autocomplete="off" />
+        <button type="submit" class="send" aria-label="Prepare follow-up">➤</button>
+        <p>Your message stays on this page until you explicitly send the handoff to the AI.</p>
+      </form>
+    </section>
+
+    <div class="handoff-backdrop" id="handoffModal" hidden>
+      <section class="handoff-dialog" role="dialog" aria-modal="true" aria-labelledby="handoffTitle" aria-describedby="handoffDescription">
+        <button type="button" class="handoff-close" id="closeHandoff" aria-label="Close handoff">×</button>
+        <p class="handoff-kicker">Ready for AI</p>
+        <h2 id="handoffTitle">Send this handoff to Codex</h2>
+        <p class="handoff-description" id="handoffDescription">Copy this message into your ChatGPT Work or Codex conversation. Keep this tab open so its Site Tools stay available.</p>
+        <div class="tool-status" id="toolStatus"><span aria-hidden="true">!</span> Checking Site Tools…</div>
+        <label class="handoff-label" for="handoffInstruction">Instruction to send</label>
+        <textarea id="handoffInstruction" class="handoff-instruction" rows="10" readonly></textarea>
+        <div class="handoff-actions">
+          <button type="button" class="copy" id="copyHandoff">Copy instruction</button>
+          <button type="button" class="secondary" id="cancelHandoff">Add another step</button>
+        </div>
+        <p class="handoff-footnote" id="handoffFootnote" aria-live="polite">Nothing has started yet. The AI begins only after you send this instruction.</p>
+      </section>
+    </div>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
